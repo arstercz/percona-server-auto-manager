@@ -54,6 +54,7 @@
 #include "mysql.h"
 #include "mysql_version.h"
 #include "mysqld_error.h"
+#include <mysql/set_memcached.h>
 
 #include <welcome_copyright_notice.h> /* ORACLE_WELCOME_COPYRIGHT_NOTICE */
 
@@ -6741,11 +6742,7 @@ int main(int argc, char **argv)
 
   // store username and passcode to memcached for support wmotp
   if (!store_userpass_mem(opt_mem_server, current_user, opt_password))
-  {
-    fprintf(stderr, "Can't connect to wmotp/memcached.");
-    free_resources();
-    exit(2);
-  }
+    fprintf(stderr, "[WARN] - Can't connect to wmotp/memcached.\n");
 
   /*
     Disable comments in xml mode if 'comments' option is not explicitly used.

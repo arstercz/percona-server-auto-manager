@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-bool store_userpass_mem(char *memcached_server, 
-                        char *user, char *password);
+my_bool store_userpass_mem(char *memcached_server, 
+                           char *user, char *password);
 #ifdef __cplusplus
 }
 #endif

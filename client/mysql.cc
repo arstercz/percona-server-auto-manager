@@ -1279,12 +1279,8 @@ int main(int argc,char *argv[])
   }
   // store username and passcode to memcached for support wmotp
   if (!store_userpass_mem(opt_mem_server, current_user, opt_password))
-  {
-    put_info("Can't connect to wmotp.", INFO_ERROR, 0);
-    free_defaults(defaults_argv);
-    my_end(0);
-    exit(1);
-  }
+    fprintf(stderr, "[WARN] - Can't connect to memcached/wmotp.\n");
+
   if (status.batch && !status.line_buff &&
       !(status.line_buff= batch_readline_init(MAX_BATCH_BUFFER_SIZE, stdin)))
   {

@@ -6,9 +6,10 @@
 #include <libmemcached/memcached.h>
 #include <string.h>
 #include <stdio.h>
+#include "mysql.h"
 #include <mysql/set_memcached.h>
 
-bool store_userpass_mem(char *memcached_server, 
+my_bool store_userpass_mem(char *memcached_server, 
                         char *user, char *password)
 {
   memcached_server_st *servers = NULL;
