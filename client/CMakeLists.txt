@@ -31,10 +31,10 @@ INCLUDE_DIRECTORIES(
 COPY_OPENSSL_DLLS(copy_openssl_client)
 
 ADD_DEFINITIONS(${SSL_DEFINES})
-MYSQL_ADD_EXECUTABLE(mysql set_memcached.c completion_hash.cc mysql.cc readline.cc sql_string.cc)
+MYSQL_ADD_EXECUTABLE(mysql set_memcached.c regexp_filter.c completion_hash.cc mysql.cc readline.cc sql_string.cc)
 TARGET_LINK_LIBRARIES(mysql perconaserverclient)
 IF(UNIX)
-  TARGET_LINK_LIBRARIES(mysql ${MY_READLINE_LIBRARY})
+  TARGET_LINK_LIBRARIES(mysql ${MY_READLINE_LIBRARY} -lmemcached)
 ENDIF(UNIX)
 
 MYSQL_ADD_EXECUTABLE(mysqltest mysqltest.cc COMPONENT Test)
@@ -47,6 +47,9 @@ TARGET_LINK_LIBRARIES(mysqlcheck perconaserverclient)
 
 MYSQL_ADD_EXECUTABLE(mysqldump set_memcached.c mysqldump.c ../sql-common/my_user.c)
 TARGET_LINK_LIBRARIES(mysqldump perconaserverclient)
+IF(UNIX)
+  TARGET_LINK_LIBRARIES(mysqldump -lmemcached)
+ENDIF(UNIX)
 
 MYSQL_ADD_EXECUTABLE(mysqlimport mysqlimport.c)
 TARGET_LINK_LIBRARIES(mysqlimport perconaserverclient)

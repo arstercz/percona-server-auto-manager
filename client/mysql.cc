@@ -36,6 +36,7 @@
 #include <stdarg.h>
 #include <my_dir.h>
 #include <mysql/set_memcached.h>
+#include <mysql/regexp_filter_custom.h>
 #ifndef __GNU_LIBRARY__
 #define __GNU_LIBRARY__		      // Skip warnings in getopt.h
 #endif
@@ -47,6 +48,7 @@
 #endif
 
 #define MAX_SYSLOG_MESSAGE 900
+#define MAX_TSIZE 200
 
 #include <algorithm>
 
@@ -3456,6 +3458,69 @@ com_go(String *buffer,char *line MY_ATTRIBUTE((unused)))
   }
   if (verbose)
     (void) com_print(buffer,0);
+
+  //disallowed rules sql statement
+  MatchRes match_response = regexp_filter_custom(buffer->ptr());
+  if (match_response.match)
+  {
+    fprintf(stderr, "\n\t[WARN]\n\t +-- %s\n\
+\t Caused by: %s\nthis sql syntax was disabled by administrator\n\n",
+            buffer->ptr(), match_response.comment);
+    return 0;
+  }
+
+  //match the table name from sql statement.
+  char *TableName = 
+    regexp_filter_match((char *)"^ALTER\\s+TABLE\\s+(\\S+)\\s+", buffer->ptr());
+  if (TableName != NULL && strlen(TableName) > 0)
+  {
+    MetaInfo metainfo = regexp_get_meta(mysql.db, TableName);
+    char *dbname = metainfo.db;
+    char *tablename = metainfo.table;
+
+    if (dbname == NULL)
+    {
+      fprintf(stderr, "\n\t[WARN] - Must 'use <database>' \
+before alter table, current database is null.\n\n");
+      return 0;
+    }
+
+    char sqlSize[350];
+    sprintf(sqlSize, "select round(sum(DATA_LENGTH+INDEX_LENGTH+DATA_FREE)/1024/1024) \
+                      as size from information_schema.tables \
+                      where table_schema = '%s' and table_name = '%s'",
+            dbname, tablename);
+    if (mysql_query(&mysql, sqlSize))
+    {
+      fprintf(stderr, "\t[WARN] - cann't get %s.%s size\n", 
+              dbname, tablename);
+      return 0;
+    }
+    MYSQL_RES *result_msg = mysql_store_result(&mysql);
+    if (result_msg == NULL) {
+      //fprintf(stderr, "\t[WARN] - cann't find %s.%s\n",
+      //        mysql.db, TableName);
+      //return 0;
+    }
+    int tableSize = 0;
+    MYSQL_ROW row_result;
+    while ((row_result = mysql_fetch_row(result_msg)))
+    {
+      if (row_result[0] == NULL)
+      {
+        //fprintf(stderr, "\t[WARN] - cann't get %s.%s size\n", 
+        //        dbname, TableName);
+        //return 0;
+      } else 
+        tableSize = atoi(row_result[0]);
+        if (tableSize >= MAX_TSIZE) {
+          fprintf(stderr, "\n\t[WARN] - the %s.%s size is %dMB, disallowed by administrator\n\n",
+                 dbname, tablename, tableSize);
+          return 0;
+        }
+    }
+  }
+  free(TableName); // free malloc space
 
   if (skip_updates &&
       (buffer->length() < 4 || my_strnncoll(charset_info,
