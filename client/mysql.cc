@@ -3455,19 +3455,10 @@ com_go(String *buffer,char *line MY_ATTRIBUTE((unused)))
   if (verbose)
     (void) com_print(buffer,0);
 
-  //disallowed rules sql statement
-  MatchRes match_response = regexp_filter_custom(buffer->ptr());
-  if (match_response.match)
-  {
-    fprintf(stderr, "\n\t[WARN]\n\t +-- %s\n\
-\t Caused by: %s\nthis sql syntax was disabled by administrator\n\n",
-            buffer->ptr(), match_response.comment);
-    return 0;
-  }
-
   //match the table name from sql statement.
   char *TableName = 
     regexp_filter_match((char *)"^ALTER\\s+TABLE\\s+(\\S+)\\s+", buffer->ptr());
+
   if (TableName != NULL && strlen(TableName) > 0)
   {
     MetaInfo metainfo = regexp_get_meta(mysql.db, TableName);
@@ -3517,6 +3508,16 @@ before alter table, current database is null.\n\n");
     }
   }
   free(TableName); // free malloc space
+
+  //disallowed rules sql statement
+  MatchRes match_response = regexp_filter_custom(buffer->ptr());
+  if (match_response.match)
+  {
+    fprintf(stderr, "\n\t[WARN]\n\t +-- %s\n\
+\t Caused by: %s\nthis sql syntax was disabled by administrator\n\n",
+            buffer->ptr(), match_response.comment);
+    return 0;
+  }
 
   if (skip_updates &&
       (buffer->length() < 4 || my_strnncoll(charset_info,
