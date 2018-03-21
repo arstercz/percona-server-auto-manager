@@ -48,7 +48,6 @@
 #endif
 
 #define MAX_SYSLOG_MESSAGE 900
-#define MAX_TSIZE 200
 
 #include <algorithm>
 
@@ -223,6 +222,10 @@ static const CHARSET_INFO *charset_info= &my_charset_latin1;
 
 // memcached options
 static char *opt_mem_server=(char *)"localhost:11211";
+// table size threshold
+static uint opt_table_threshold = 0;
+// is enable sql_filter
+static my_bool opt_sql_filter = TRUE;
 
 #include "sslopt-vars.h"
 
@@ -1809,6 +1812,12 @@ static struct my_option my_long_options[] =
   {"memcached-server", OPT_MEM_SERVER, "Memcached server for client-side record.",
    &opt_mem_server, &opt_mem_server, 0, 
    GET_STR, REQUIRED_ARG, 0, 0, 0, 0, 0, 0},
+  {"table-threshold", OPT_TABLE_THRESHOLD, 
+   "table size(MB) threshold for invoke pt-osc tool, default is 200",
+   &opt_table_threshold, &opt_table_threshold, 0, 
+   GET_UINT, REQUIRED_ARG, 200, 0, 0, 0, 0, 0},
+  {"sql-filter", OPT_SQL_FILTER, "whether enable sql filter, default is true(1)",
+   &opt_sql_filter, &opt_sql_filter, 0, GET_BOOL, NO_ARG, 1, 0, 0, 0, 0, 0},
   { 0, 0, 0, 0, 0, 0, GET_NO_ARG, NO_ARG, 0, 0, 0, 0, 0, 0}
 };
 
@@ -3500,7 +3509,7 @@ before alter table, current database is null.\n\n");
         //return 0;
       } else 
         tableSize = atoi(row_result[0]);
-        if (tableSize >= MAX_TSIZE) {
+        if (tableSize >= (int)opt_table_threshold) {
           fprintf(stderr, "\n\t[WARN] - the %s.%s size is %dMB, disallowed by administrator\n\n",
                  dbname, tablename, tableSize);
           return 0;
@@ -3510,13 +3519,15 @@ before alter table, current database is null.\n\n");
   free(TableName); // free malloc space
 
   //disallowed rules sql statement
-  MatchRes match_response = regexp_filter_custom(buffer->ptr());
-  if (match_response.match)
-  {
-    fprintf(stderr, "\n\t[WARN]\n\t +-- %s\n\
+  if (opt_sql_filter) {
+    MatchRes match_response = regexp_filter_custom(buffer->ptr());
+    if (match_response.match)
+    {
+      fprintf(stderr, "\n\t[WARN]\n\t +-- %s\n\
 \t Caused by: %s\nthis sql syntax was disabled by administrator\n\n",
-            buffer->ptr(), match_response.comment);
-    return 0;
+              buffer->ptr(), match_response.comment);
+      return 0;
+    }
   }
 
   if (skip_updates &&
