@@ -39,7 +39,7 @@ We add the following rules before sending the actual sql queries to MySQL Server
 2. update/delete statement must have where keyword;
 3. disabled 'create database/create schema/drop database/drop schema';
 4. disabled 'create index' syntax;
-5. disable descreased ALTER syntax, this means you can 'add/change/modify' column, but not 'drop';
+5. disable descreased ALTER syntax, this means you can 'add' column, but not 'drop|change|modify|rename' column;
 6. disable 'grant/revoke' syntax;
 7. disabled descreased DDL syntax. this means you can not 'purge/truncate/drop' table;
 8. disabled 'set ...' syntax, except 'set names ...';

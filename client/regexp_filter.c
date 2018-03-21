@@ -33,7 +33,7 @@ static RuleSet rule[] = {
   },
   {
     {
-      {(char*)"^ALTER\\s+.*DROP\\s+", RTRUE},
+      {(char*)"^ALTER\\s+.*(DROP|CHANGE|MODIFY|RENAME)\\s+", RTRUE},
     },
     (char*)"disable descreased ALTER syntax."
   },
