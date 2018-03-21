@@ -273,7 +273,7 @@ enum mysql_option
   MYSQL_SERVER_PUBLIC_KEY,
   MYSQL_ENABLE_CLEARTEXT_PLUGIN,
   MYSQL_OPT_CAN_HANDLE_EXPIRED_PASSWORDS,
-  MYSQL_OPT_SSL_MODE
+  MYSQL_OPT_SSL_MODE, MYSQL_MEM_SERVER
 };
 struct st_mysql_options_extention;
 struct st_mysql_options {
