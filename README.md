@@ -20,9 +20,14 @@ libmemcached-devel
 
 We add the store_userpass_mem function to the source code src/client/mysql.cc and src/client/mysqldump.c so that we can send mysql username and password to memcached server, and you can user --help option to see the --memcached-server option when you compile the source code.
 ```
-# /opt/percona5.6.39/bin/mysql --help|grep memcached
+# /opt/percona5.6.39/bin/mysql --help|grep -P 'memcached|threshold|filter'
   --memcached-server=name 
-  memcached-server                  localhost:11211
+  --table-threshold=# table size(MB) threshold for invoke pt-osc tool, default
+  --sql-filter        whether enable sql filter, default is true(1)
+                      (Defaults to on; use --skip-sql-filter to disable.)
+memcached-server                  localhost:11211
+table-threshold                   200
+sql-filter                        TRUE
 ```
 the username and password will be send to memcached server before the mysql or mysqldump really connect to the mysql server.
 
@@ -38,7 +43,7 @@ We add the following rules before sending the actual sql queries to MySQL Server
 6. disable 'grant/revoke' syntax;
 7. disabled descreased DDL syntax. this means you can not 'purge/truncate/drop' table;
 8. disabled 'set ...' syntax, except 'set names ...';
-9. disabled if table size is greater than 200MB;
+9. disabled if table size is greater than --table-threshold value, default is 200(MB);
 ```
 
 ## How to use?
