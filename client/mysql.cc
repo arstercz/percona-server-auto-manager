@@ -3474,7 +3474,7 @@ com_go(String *buffer,char *line MY_ATTRIBUTE((unused)))
     char *dbname = metainfo.db;
     char *tablename = metainfo.table;
 
-    if (dbname == NULL)
+    if (dbname == NULL || mysql.db == NULL)
     {
       fprintf(stderr, "\n\t[WARN] - Must 'use <database>' \
 before alter table, current database is null.\n\n");
