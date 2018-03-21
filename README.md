@@ -38,6 +38,7 @@ We add the following rules before sending the actual sql queries to MySQL Server
 6. disable 'grant/revoke' syntax;
 7. disabled descreased DDL syntax. this means you can not 'purge/truncate/drop' table;
 8. disabled 'set ...' syntax, except 'set names ...';
+9. disabled if table size is greater than 200MB;
 ```
 
 ## How to use?
@@ -88,5 +89,8 @@ mysql arstercz@[10.0.21.5:3305 percona] > delete from checksums;
          Caused by: no where for delete/update clause
 this sql syntax was disabled by administrator
 
-mysql arstercz@[10.0.21.5:3305 percona] >
+mysql arstercz@[10.0.21.5:3305 percona] > alter table user_info add column sss varchar(50);
+
+        [WARN] - the test.user_info size is 4240MB, disallowed by administrator
+
 ```
