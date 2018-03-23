@@ -5,7 +5,7 @@
 
 Documentation: [percona-server-5.6.39-83.1](http://www.percona.com/doc/percona-server/5.6)
 
-*note*: don't used in product environment, the memcached feature maybe usefull when you want login mysql server with `one-time-one-password` way, such as [google totp](https://highdb.com/%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-mysql-%E7%9A%84%E4%B8%80%E6%AC%A1%E4%B8%80%E5%AF%86%E7%99%BB%E5%BD%95/). and the `sql filter` can be helpful when you want restrict the developers only execute allowed sql statement.
+*note*: the memcached feature maybe usefull when you want login mysql server with `one-time-one-password` way, such as [google totp](https://highdb.com/%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-mysql-%E7%9A%84%E4%B8%80%E6%AC%A1%E4%B8%80%E5%AF%86%E7%99%BB%E5%BD%95/). and the `sql filter` can be helpful when you want restrict the developers only execute allowed sql statement, you can disabled this with `--skip-sql-filter` option.
 
 ## Dependency
 
