@@ -42,6 +42,7 @@ enum audit_log_policy_t { ALL, NONE, LOGINS, QUERIES };
 enum audit_log_strategy_t
   { ASYNCHRONOUS, PERFORMANCE, SEMISYNCHRONOUS, SYNCHRONOUS };
 enum audit_log_format_t { OLD, NEW, JSON, CSV };
+enum audit_log_timezone_t {UTC, LOCAL};
 enum audit_log_handler_t { HANDLER_FILE, HANDLER_SYSLOG };
 
 typedef void (*escape_buf_func_t)(const char *, size_t *, char *, size_t *);
@@ -58,6 +59,7 @@ ulonglong audit_log_rotate_on_size= 0;
 ulonglong audit_log_rotations= 0;
 char audit_log_flush= FALSE;
 ulong audit_log_format= OLD;
+ulong audit_log_timezone= UTC;
 ulong audit_log_handler= HANDLER_FILE;
 char *audit_log_syslog_ident;
 char default_audit_log_syslog_ident[] = "percona-audit";
@@ -143,7 +145,12 @@ char *make_timestamp(char *buf, size_t buf_len, time_t t)
   struct tm tm;
 
   memset(&tm, 0, sizeof(tm));
-  strftime(buf, buf_len, "%FT%T UTC", gmtime_r(&t, &tm));
+  if ((audit_log_timezone == UTC)) {
+    strftime(buf, buf_len, "%FT%T UTC", gmtime_r(&t, &tm));
+  }
+  else {
+    strftime(buf, buf_len, "%FT%T", localtime_r(&t, &tm));
+  }
 
   return buf;
 }
@@ -1308,6 +1315,18 @@ static MYSQL_SYSVAR_ENUM(format, audit_log_format,
        "The audit log file format.", NULL, NULL,
        ASYNCHRONOUS, &audit_log_format_typelib);
 
+static const char *audit_log_timezone_names[]=
+  {"UTC", "LOCAL", 0};
+static TYPELIB audit_log_timezone_typelib=
+{
+  array_elements(audit_log_format_names) - 1, "audit_log_timezone_typelib",
+  audit_log_timezone_names, NULL
+};
+static MYSQL_SYSVAR_ENUM(timezone, audit_log_timezone,
+       PLUGIN_VAR_RQCMDARG,
+       "The audit log file timezone.", NULL, NULL,
+       UTC, &audit_log_timezone_typelib);
+
 static const char *audit_log_handler_names[]=
   { "FILE", "SYSLOG", 0 };
 static TYPELIB audit_log_handler_typelib=
@@ -1652,6 +1671,7 @@ static struct st_mysql_sys_var* audit_log_system_variables[] =
   MYSQL_SYSVAR(policy),
   MYSQL_SYSVAR(strategy),
   MYSQL_SYSVAR(format),
+  MYSQL_SYSVAR(timezone),
   MYSQL_SYSVAR(buffer_size),
   MYSQL_SYSVAR(rotate_on_size),
   MYSQL_SYSVAR(rotations),
