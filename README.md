@@ -110,3 +110,12 @@ mysql arstercz@[10.0.21.5:3305 percona] > alter table test.user_info add column 
         [WARN] - the test.user_info size is 4240MB, disallowed by administrator
 
 ```
+
+## extra feature
+
+### audit_log plugin
+
+we add `audit_log_timezone` option to support LOCAL or UTC timezone in [audit_log](https://www.percona.com/doc/percona-server/5.6/management/audit_log_plugin.html), default is UTC, you can change with dynamic way:
+```
+set global audit_log_timezone = LOCAL;
+```
