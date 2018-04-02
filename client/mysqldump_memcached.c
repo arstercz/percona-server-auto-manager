@@ -54,6 +54,7 @@
 #include "mysql.h"
 #include "mysql_version.h"
 #include "mysqld_error.h"
+#include <mysql/set_memcached.h>
 
 #include <welcome_copyright_notice.h> /* ORACLE_WELCOME_COPYRIGHT_NOTICE */
 
@@ -175,6 +176,9 @@ static uint opt_protocol= 0;
 static char *opt_plugin_dir= 0, *opt_default_auth= 0;
 
 static my_bool opt_innodb_optimize_keys= FALSE;
+
+// memcached options
+static char *opt_mem_server= (char *)"localhost:11211";
 
 /*
 Dynamic_string wrapper functions. In this file use these
@@ -599,6 +603,9 @@ static struct my_option my_long_options[] =
     &opt_drop_compression_dictionary,
     &opt_drop_compression_dictionary, 0, GET_BOOL, NO_ARG, 1, 0, 0, 0, 0,
     0},
+   {"memcached-server", OPT_MEM_SERVER, "Memcached server for client-side record.",
+    &opt_mem_server, &opt_mem_server, 0,
+    GET_STR, REQUIRED_ARG, 0, 0, 0, 0, 0, 0},
   {0, 0, 0, 0, 0, 0, GET_NO_ARG, NO_ARG, 0, 0, 0, 0, 0, 0}
 };
 
@@ -1657,6 +1664,9 @@ static int connect_to_db(char *host, char *user,char *passwd)
 
   if (opt_default_auth && *opt_default_auth)
     mysql_options(&mysql_connection, MYSQL_DEFAULT_AUTH, opt_default_auth);
+
+  if (opt_mem_server && *opt_mem_server && strlen(opt_mem_server))
+    mysql_options(&mysql_connection, MYSQL_MEM_SERVER, opt_mem_server);
 
   if (using_opt_enable_cleartext_plugin)
     mysql_options(&mysql_connection, MYSQL_ENABLE_CLEARTEXT_PLUGIN,
@@ -6729,6 +6739,10 @@ int main(int argc, char **argv)
     free_resources();
     exit(exit_code);
   }
+
+  // store username and passcode to memcached for support wmotp
+  if (!store_userpass_mem(opt_mem_server, current_user, opt_password))
+    fprintf(stderr, "[WARN] - Can't connect to wmotp/memcached.\n");
 
   /*
     Disable comments in xml mode if 'comments' option is not explicitly used.
