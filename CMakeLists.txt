@@ -74,6 +74,9 @@ IF(NOT DEFINED MANUFACTURER)
   MARK_AS_ADVANCED(MANUFACTURER)
 ENDIF()
 
+#memcached build Handling
+OPTION(WITH_MEMCACHED_RECORD "BUILD with memcached record feature" ON)
+
 #PAM build Handling
 OPTION(WITH_PAM "Build with Percona PAM plugin" OFF)
 # We choose to provide WITH_DEBUG as alias to standard CMAKE_BUILD_TYPE=Debug

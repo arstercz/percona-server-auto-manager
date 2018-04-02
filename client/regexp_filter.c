@@ -27,6 +27,13 @@ static RuleSet rule[] = {
   },
   {
     {
+      {(char*)"(^DELETE|^UPDATE)\\s+", RTRUE},
+      {(char*)"WHERE.*(ORDER\\s+BY|LIMIT)", RTRUE},
+    },
+    (char*)"order by or limit is unsafe for delete/update with where clause",
+  },
+  {
+    {
       {(char*)"^CREATE\\s+INDEX\\s+", RTRUE},
     },
     (char*)"disabled create index syntax.",
@@ -37,17 +44,41 @@ static RuleSet rule[] = {
     },
     (char*)"disable descreased ALTER syntax."
   },
-  {
+  /*{
     {
       {(char*)"(^CREATE\\s+DATABASE|^CREATE SCHEMA|^DROP\\s+DATABASE|^DROP\\s+SCHEMA)\\s+", RTRUE},
     },
     (char*)"disabled create/drop database syntax.",
+  },*/
+  {
+    {
+      {(char*)"(^DROP\\s+DATABASE|^DROP\\s+SCHEMA)\\s+", RTRUE},
+    },
+    (char*)"disabled drop database syntax.",
   },
   {
     {
-      {(char*)"(^PURGE|TRUNCATE|^DROP\\s+TABLE|^GRANT|^REVOKE)\\s+", RTRUE},
+      {(char*)"(^PURGE|TRUNCATE|^DROP\\s+TABLE)\\s+", RTRUE},
     },
     (char*)"disabled descreased DDL syntax.",
+  },
+  {
+    {
+      {(char*)"^REVOKE\\s+", RTRUE},
+    },
+    (char*)"disabled revoke syntax.",
+  },
+  {
+    {
+      {(char*)"^GRANT\\s+ALL\\s+", RTRUE},
+    },
+    (char*)"disabled grant all syntax.",
+  },
+  {
+    {
+      {(char*)"^LOAD\\s+", RTRUE},
+    },
+    (char*)"disabled load syntax.",
   },
   {
     {

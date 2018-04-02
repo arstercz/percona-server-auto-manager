@@ -14,6 +14,14 @@ The memcached option depended on the following package:
 libmemcached-devel
 ```
 
+## How to compile
+
+you can compile the source with the same way in [percona-source-install](https://www.percona.com/doc/percona-server/5.6/installation.html#installing-percona-server-from-a-source-tarball), the memcached record feature was off by default, you can disabled this with the following option:
+```
+cmake . -DWITH_MEMCACHED_RECORD=OFF
+```
+the sql filter feature was embedded into `client/mysql` with `--sql-fiter` option, default is on, you can disabled this by `--skip-sql-filter` when you connect mysql server.
+
 ## How does it work?
 
 ### memcached option
@@ -37,13 +45,16 @@ We add the following rules before sending the actual sql queries to MySQL Server
 ```
 1. select statement must have where/limit keywords;
 2. update/delete statement must have where keyword;
-3. disabled 'create database/create schema/drop database/drop schema';
-4. disabled 'create index' syntax;
-5. disable descreased ALTER syntax, this means you can 'add' column, but not 'drop|change|modify|rename' column;
-6. disable 'grant/revoke' syntax;
-7. disabled descreased DDL syntax. this means you can not 'purge/truncate/drop' table;
-8. disabled 'set ...' syntax, except 'set names ...';
-9. disabled if table size is greater than --table-threshold value, default is 200(MB);
+3. disable 'update/delete ..where..(order by|limit)' syntax;
+4. disable 'drop database/drop schema' syntax;
+5. disable 'create index' syntax;
+6. disable descreased ALTER syntax, this means you can 'add' column, but not 'drop|change|modify|rename' column;
+7. disable 'grant all' syntax;
+8. disable 'revoke' syntax;
+9. disable 'load' syntax;
+10. disabled descreased DDL syntax. this means you can not 'purge/truncate/drop' table;
+11. disabled 'set ...' syntax, except 'set names ...';
+12. disabled if table size is greater than --table-threshold value, default is 200(MB);
 ```
 
 ## How to use?
@@ -94,7 +105,7 @@ mysql arstercz@[10.0.21.5:3305 percona] > delete from checksums;
          Caused by: no where for delete/update clause
 this sql syntax was disabled by administrator
 
-mysql arstercz@[10.0.21.5:3305 percona] > alter table user_info add column sss varchar(50);
+mysql arstercz@[10.0.21.5:3305 percona] > alter table test.user_info add column sss varchar(50);
 
         [WARN] - the test.user_info size is 4240MB, disallowed by administrator
 
