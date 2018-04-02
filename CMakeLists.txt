@@ -75,7 +75,7 @@ IF(NOT DEFINED MANUFACTURER)
 ENDIF()
 
 #memcached build Handling
-OPTION(WITH_MEMCACHED_RECORD "BUILD with memcached record feature" ON)
+OPTION(WITH_MEMCACHED_RECORD "BUILD with memcached record feature" OFF)
 
 #PAM build Handling
 OPTION(WITH_PAM "Build with Percona PAM plugin" OFF)

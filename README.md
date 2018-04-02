@@ -16,9 +16,9 @@ libmemcached-devel
 
 ## How to compile
 
-you can compile the source with the same way in [percona-source-install](https://www.percona.com/doc/percona-server/5.6/installation.html#installing-percona-server-from-a-source-tarball), the memcached record feature was off by default, you can disabled this with the following option:
+you can compile the source with the same way in [percona-source-install](https://www.percona.com/doc/percona-server/5.6/installation.html#installing-percona-server-from-a-source-tarball), the memcached record feature was off by default, you can enable this with the following option:
 ```
-cmake . -DWITH_MEMCACHED_RECORD=OFF
+cmake . -DWITH_MEMCACHED_RECORD=ON
 ```
 the sql filter feature was embedded into `client/mysql` with `--sql-fiter` option, default is on, you can disabled this by `--skip-sql-filter` when you connect mysql server.
 
@@ -30,7 +30,7 @@ We add the store_userpass_mem function to the source code src/client/mysql.cc an
 ```
 # /opt/percona5.6.39/bin/mysql --help|grep -P 'memcached|threshold|filter'
   --memcached-server=name 
-  --table-threshold=# table size(MB) threshold for invoke pt-osc tool, default
+  --table-threshold=# table size(MB) threshold for disabled alter syntax, default
   --sql-filter        whether enable sql filter, default is true(1)
                       (Defaults to on; use --skip-sql-filter to disable.)
 memcached-server                  localhost:11211
