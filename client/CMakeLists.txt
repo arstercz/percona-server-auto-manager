@@ -35,7 +35,8 @@ MYSQL_ADD_EXECUTABLE(mysql set_memcached.c regexp_filter.c completion_hash.cc my
 TARGET_LINK_LIBRARIES(mysql perconaserverclient)
 IF(UNIX AND WITH_MEMCACHED_RECORD)
   TARGET_LINK_LIBRARIES(mysql ${MY_READLINE_LIBRARY} -lmemcached)
-ELSEIF(UNIX)
+ENDIF(UNIX AND WITH_MEMCACHED_RECORD)
+IF(UNIX)
   TARGET_LINK_LIBRARIES(mysql ${MY_READLINE_LIBRARY})
 ENDIF(UNIX)
 
@@ -51,7 +52,8 @@ MYSQL_ADD_EXECUTABLE(mysqldump set_memcached.c mysqldump.c ../sql-common/my_user
 TARGET_LINK_LIBRARIES(mysqldump perconaserverclient)
 IF(UNIX AND WITH_MEMCACHED_RECORD)
   TARGET_LINK_LIBRARIES(mysqldump -lmemcached)
-ELSEIF(UNIX)
+ENDIF(UNIX AND WITH_MEMCACHED_RECORD)
+IF(UNIX)
   TARGET_LINK_LIBRARIES(mysqldump)
 ENDIF(UNIX)
 
