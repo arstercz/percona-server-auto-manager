@@ -1813,7 +1813,7 @@ static struct my_option my_long_options[] =
    &opt_mem_server, &opt_mem_server, 0, 
    GET_STR, REQUIRED_ARG, 0, 0, 0, 0, 0, 0},
   {"table-threshold", OPT_TABLE_THRESHOLD, 
-   "table size(MB) threshold for invoke pt-osc tool, default is 200",
+   "table size(MB) threshold for disabled alter syntax, default is 200",
    &opt_table_threshold, &opt_table_threshold, 0, 
    GET_UINT, REQUIRED_ARG, 200, 0, 0, 0, 0, 0},
   {"sql-filter", OPT_SQL_FILTER, "whether enable sql filter, default is true(1)",
