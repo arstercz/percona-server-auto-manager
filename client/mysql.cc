@@ -223,6 +223,7 @@ static const CHARSET_INFO *charset_info= &my_charset_latin1;
 static uint opt_table_threshold = 0;
 // is enable sql_filter
 static my_bool opt_sql_filter = TRUE;
+static int is_readonly= 0;
 
 #include "sslopt-vars.h"
 
@@ -3187,6 +3188,23 @@ static void get_current_db()
   }
 }
 
+static void readonly_check()
+{
+  MYSQL_RES *res;
+  /* Check whether is readonly */
+  if (!mysql_query(&mysql, "SELECT @@read_only") &&
+      (res = mysql_use_result(&mysql)))
+  {
+    MYSQL_ROW row= mysql_fetch_row(res);
+    if (row && row[0] && atoi(row[0]) == 1)
+      is_readonly = 1; // read only
+    else
+      is_readonly = 0; // read write
+
+    mysql_free_result(res);
+  }
+}
+
 /***************************************************************************
  The different commands
 ***************************************************************************/
@@ -5711,6 +5729,10 @@ static const char* construct_prompt()
       case 'l':
 	processed_prompt.append(delimiter_str);
 	break;
+      case 'i':
+        readonly_check();
+        processed_prompt.append(is_readonly == 1 ? "ro" : "rw");
+        break;
       default:
 	processed_prompt.append(c);
       }

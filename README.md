@@ -119,3 +119,29 @@ we add `audit_log_timezone` option to support LOCAL or UTC timezone in [audit_lo
 ```
 set global audit_log_timezone = LOCAL;
 ```
+
+### readonly prompt
+
+you can add `\i` to mysql prompt option to know whether the mysql server is readonly or not, `ro` means `read only`, this maybe a slave host, `rw` means `read write`:
+```
+[mysql]
+prompt = 'mysql \u@[\h:\p \d \i] > '
+```
+readonly check was embedded whether you enable `WITH_MEMCACHED_RECORD`:
+```
+mysql root@[localhost:s3301 (none) rw] > select @@read_only;
++-------------+
+| @@read_only |
++-------------+
+|           0 |
++-------------+
+1 row in set (0.00 sec)
+
+mysql root@[localhost:s3301 (none) rw] > set global read_only = 1;
+Query OK, 0 rows affected (0.07 sec)
+
+mysql root@[localhost:s3301 (none) ro] > set global read_only = 0;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql root@[localhost:s3301 (none) rw] > 
+```
