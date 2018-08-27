@@ -3526,11 +3526,13 @@ before alter table, current database is null.\n\n");
         //        dbname, TableName);
         //return 0;
       } else 
-        tableSize = atoi(row_result[0]);
-        if (tableSize >= (int)opt_table_threshold) {
-          fprintf(stderr, "\n\t[WARN] - the %s.%s size is %dMB, disallowed by administrator\n\n",
-                 dbname, tablename, tableSize);
-          return 0;
+        if (opt_sql_filter) {
+          tableSize = atoi(row_result[0]);
+          if (tableSize >= (int)opt_table_threshold) {
+            fprintf(stderr, "\n\t[WARN] - the %s.%s size is %dMB, disallowed by administrator\n\n",
+                   dbname, tablename, tableSize);
+            return 0;
+          }
         }
     }
   }
