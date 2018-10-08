@@ -57,6 +57,14 @@ We add the following rules before sending the actual sql queries to MySQL Server
 12. disabled if table size is greater than --table-threshold value, default is 200(MB);
 ```
 
+### record sql
+
+We add `--record-file` option to record all sql, default is `/tmp/.mysql_record_all`, every user have a `$record-file.$USER` file to record the sql, you can use `--record-file=""` to skip record the sql query. if you login with root user:
+```
+# less /tmp/.mysql_record_all.root 
+[2018-10-08T12:50:55 login:root user:root shell:/bin/bash cwd:/home/mysql/percona-server-auto-manager/client db:(null)] show databases
+[2018-10-08T12:50:59 login:root user:root shell:/bin/bash cwd:/home/mysql/percona-server-auto-manager/client db:test] show tables
+```
 ## How to use?
 
 login mysql server with a right/wrong password:

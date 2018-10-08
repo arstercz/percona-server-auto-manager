@@ -181,6 +181,8 @@ static char *current_host,*current_db,*current_user=0,*opt_password=0,
             *opt_init_command= 0;
 static char *histfile;
 static char *histfile_tmp;
+static char *opt_record_file = (char *)"/tmp/.mysql_record_all";
+static char *record_tmp;
 static char *opt_histignore= NULL;
 DYNAMIC_STRING histignore_buffer;
 static String glob_buffer,old_buffer;
@@ -1124,6 +1126,7 @@ typedef struct _hist_entry {
 extern "C" int add_history(const char *command); /* From readline directory */
 extern "C" int read_history(const char *command);
 extern "C" int write_history(const char *command);
+extern "C" int record_all_history(const char *, const char *, const char *);
 extern "C" HIST_ENTRY *history_get(int num);
 extern "C" int history_length;
 #endif
@@ -1819,6 +1822,9 @@ static struct my_option my_long_options[] =
    GET_UINT, REQUIRED_ARG, 200, 0, 0, 0, 0, 0},
   {"sql-filter", OPT_SQL_FILTER, "whether enable sql filter, default is true(1)",
    &opt_sql_filter, &opt_sql_filter, 0, GET_BOOL, NO_ARG, 1, 0, 0, 0, 0, 0},
+  {"record-file", OPT_RECORD_ALL, "record all execute command.",
+   &opt_record_file, &opt_record_file, 0,
+   GET_STR, REQUIRED_ARG, 0, 0, 0, 0, 0, 0},
   { 0, 0, 0, 0, 0, 0, GET_NO_ARG, NO_ARG, 0, 0, 0, 0, 0, 0}
 };
 
@@ -3481,6 +3487,19 @@ com_go(String *buffer,char *line MY_ATTRIBUTE((unused)))
   }
   if (verbose)
     (void) com_print(buffer,0);
+
+  // record all sql
+  if (strlen(opt_record_file)) {
+    if (!(record_tmp= (char*) my_malloc((uint) strlen(opt_record_file) + strlen(getenv("USER")),
+                                        MYF(MY_WME))))
+    {
+      fprintf(stderr, "Couldn't allocate memory for record file!\n");
+    }
+    sprintf(record_tmp, "%s.%s", opt_record_file, getenv("USER"));
+    if (record_all_history(record_tmp, buffer->ptr(), mysql.db)) {
+      fprintf(stderr, "record all error!\n");
+    }
+  }
 
   //match the table name from sql statement.
   char *TableName = 
