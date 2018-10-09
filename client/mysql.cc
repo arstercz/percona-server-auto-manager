@@ -1123,7 +1123,6 @@ typedef struct _hist_entry {
 extern "C" int add_history(const char *command); /* From readline directory */
 extern "C" int read_history(const char *command);
 extern "C" int write_history(const char *command);
-extern "C" int record_all_history(const char *, const char *, const char *);
 extern "C" HIST_ENTRY *history_get(int num);
 extern "C" int history_length;
 #endif
