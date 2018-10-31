@@ -295,7 +295,8 @@ get_current_time(void)
 
 
 int
-record_all_history(const char *filename, const char *sql, const char *db)
+record_all_history(const char *filename, const char *sql, 
+                   const char *host, unsigned  int port, const char *db)
 {
         FILE *fp;
         fp = fopen(filename, "a+");
@@ -303,8 +304,9 @@ record_all_history(const char *filename, const char *sql, const char *db)
                 //fprintf(stderr, "%s opening failed", filename);
                 return 1;
         }
-        fprintf(fp, "[%s login:%s user:%s shell:%s cwd:%s db:%s] %s\n", get_current_time(),
-                getenv("LOGNAME"),getenv("USER"), getenv("SHELL"), getenv("PWD"), db, sql);
+        fprintf(fp, "[%s host:%s port:%d pid:%d ppid:%d login:%s user:%s shell:%s cwd:%s db:%s] %s\n", 
+                   get_current_time(), host, port, getpid(), getppid(), getenv("LOGNAME"),getenv("USER"), 
+                   getenv("SHELL"), getenv("PWD"), db, sql);
         fclose(fp);
         return 0;
 }

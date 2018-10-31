@@ -3485,7 +3485,7 @@ com_go(String *buffer,char *line MY_ATTRIBUTE((unused)))
       fprintf(stderr, "Couldn't allocate memory for record file!\n");
     }
     sprintf(record_tmp, "%s.%s", opt_record_file, getenv("USER"));
-    if (record_all_history(record_tmp, buffer->ptr(), mysql.db)) {
+    if (record_all_history(record_tmp, buffer->ptr(), mysql.host, mysql.port, mysql.db)) {
       fprintf(stderr, "record all error!\n");
     }
   }

@@ -39,6 +39,6 @@ extern LINE_BUFFER *batch_readline_command(LINE_BUFFER *buffer, char * str);
 extern char *batch_readline(LINE_BUFFER *buffer, bool binary_mode);
 extern void batch_readline_end(LINE_BUFFER *buffer);
 extern char *get_current_time(void);
-extern int record_all_history(const char *, const char *, const char *);
+extern int record_all_history(const char *, const char *, const char *, unsigned int, const char *);
 
 #endif /* CLIENT_MY_READLINE_INCLUDED */
