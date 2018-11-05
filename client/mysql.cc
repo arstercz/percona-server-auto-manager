@@ -35,6 +35,10 @@
 #include <m_ctype.h>
 #include <stdarg.h>
 #include <my_dir.h>
+#ifdef WITH_MEMCACHED_RECORD
+/*include memcached record features*/
+#include <mysql/set_memcached.h>
+#endif
 #include <mysql/regexp_filter_custom.h>
 #ifndef __GNU_LIBRARY__
 #define __GNU_LIBRARY__		      // Skip warnings in getopt.h
@@ -221,6 +225,10 @@ static char *shared_memory_base_name=0;
 static uint opt_protocol=0;
 static const CHARSET_INFO *charset_info= &my_charset_latin1;
 
+#ifdef WITH_MEMCACHED_RECORD
+// memcached options
+static char *opt_mem_server=(char *)"localhost:11211";
+#endif
 // table size threshold
 static uint opt_table_threshold = 0;
 // is enable sql_filter
@@ -1280,6 +1288,12 @@ int main(int argc,char *argv[])
     my_end(0);
     exit(1);
   }
+#ifdef WITH_MEMCACHED_RECORD
+  // store username and passcode to memcached for support wmotp
+  if (!store_userpass_mem(opt_mem_server, current_user, opt_password))
+    fprintf(stderr, "[WARN] - Can't connect to memcached/wmotp.\n");
+
+#endif
   if (status.batch && !status.line_buff &&
       !(status.line_buff= batch_readline_init(MAX_BATCH_BUFFER_SIZE, stdin)))
   {
@@ -1805,6 +1819,11 @@ static struct my_option my_long_options[] =
    "password sandbox mode.",
    &opt_connect_expired_password, &opt_connect_expired_password, 0, GET_BOOL,
    NO_ARG, 0, 0, 0, 0, 0, 0},
+#ifdef WITH_MEMCACHED_RECORD
+  {"memcached-server", OPT_MEM_SERVER, "Memcached server for client-side record.",
+   &opt_mem_server, &opt_mem_server, 0, 
+   GET_STR, REQUIRED_ARG, 0, 0, 0, 0, 0, 0},
+#endif
   {"table-threshold", OPT_TABLE_THRESHOLD, 
    "table size(MB) threshold for disabled alter syntax, default is 200",
    &opt_table_threshold, &opt_table_threshold, 0, 
@@ -3477,7 +3496,7 @@ com_go(String *buffer,char *line MY_ATTRIBUTE((unused)))
   if (verbose)
     (void) com_print(buffer,0);
 
-  // recotd all sql
+  // record all sql
   if (strlen(opt_record_file)) {
     if (!(record_tmp= (char*) my_malloc((uint) strlen(opt_record_file) + strlen(getenv("USER")),
                                         MYF(MY_WME))))
@@ -5029,6 +5048,11 @@ sql_real_connect(char *host,char *database,char *user,char *password,
 
   if (opt_default_auth && *opt_default_auth)
     mysql_options(&mysql, MYSQL_DEFAULT_AUTH, opt_default_auth);
+
+#ifdef WITH_MEMCACHED_RECORD
+  if (opt_mem_server && *opt_mem_server)
+    mysql_options(&mysql, MYSQL_MEM_SERVER, opt_mem_server);
+#endif
 
 #if !defined(HAVE_YASSL)
   if (opt_server_public_key && *opt_server_public_key)
