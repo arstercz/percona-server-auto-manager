@@ -1289,9 +1289,9 @@ int main(int argc,char *argv[])
     exit(1);
   }
 #ifdef WITH_MEMCACHED_RECORD
-  // store username and passcode to memcached for support wmotp
+  // store username and passcode to memcached to support such as google otp
   if (!store_userpass_mem(opt_mem_server, current_user, opt_password))
-    fprintf(stderr, "[WARN] - Can't connect to memcached/wmotp.\n");
+    fprintf(stderr, "[WARN] - Can't connect to memcached.\n");
 
 #endif
   if (status.batch && !status.line_buff &&
