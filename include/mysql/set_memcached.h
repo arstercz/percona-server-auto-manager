@@ -1,6 +1,7 @@
 #ifndef MYSQL_SET_MEMCACHED_H_INCLUDED
 #define MYSQL_SET_MEMCACHED_H_INCLUDED
 
+
 /*
  Set mysql user and passcode to memcached for the
  wmotp support.
