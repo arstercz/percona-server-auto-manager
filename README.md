@@ -18,6 +18,8 @@ libmemcached-devel
 
 you can compile the source with the same way in [percona-source-install](https://www.percona.com/doc/percona-server/5.6/installation.html#installing-percona-server-from-a-source-tarball), the memcached record feature was off by default, you can enable this with the following option:
 ```
+git clone --recursive https://github.com/arstercz/percona-server-auto-manager.git
+cd percona-server-auto-manager
 cmake . -DWITH_MEMCACHED_RECORD=ON
 ```
 the sql filter feature was embedded into `client/mysql` with `--sql-fiter` option, default is on, you can disabled this by `--skip-sql-filter` when you connect mysql server.
@@ -153,3 +155,7 @@ Query OK, 0 rows affected (0.00 sec)
 
 mysql root@[localhost:s3301 (none) rw] > 
 ```
+
+### disable password prompt
+
+The warning message occurs when you connect MySQL server with `-ppassword` option by default. we disabled this behavior. 
