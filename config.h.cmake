@@ -538,6 +538,12 @@
 #cmakedefine HAVE_HTONLL 1
 
 /*
+  Memcached record feature
+*/
+#cmakedefine WITH_MEMCACHED_RECORD 1
+
+
+/*
   MySQL features
 */
 #cmakedefine ENABLED_LOCAL_INFILE 1

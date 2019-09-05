@@ -14,16 +14,16 @@ The memcached option depended on the following package:
 libmemcached-devel
 ```
 
-## How to compile
+## How to build
 
 you can compile the source with the same way in [percona-source-install](https://www.percona.com/doc/percona-server/5.6/installation.html#installing-percona-server-from-a-source-tarball), the memcached record feature was off by default, you can enable this with the following option:
-```
+```c
 git clone --recursive https://github.com/arstercz/percona-server-auto-manager.git
 cd percona-server-auto-manager
 
-cmake . -DWITH_MEMCACHED_RECORD=ON
+cmake . -DWITH_MEMCACHED_RECORD=ON -DWITH_EMBEDDED_SERVER=OFF -DBUILD_TESTING=OFF
 or
-cmake . # if you don't need memcached record
+cmake . -DWITH_EMBEDDED_SERVER=OFF -DBUILD_TESTING=OFF         # if you don't need memcached record
 
 # just make client
 cd client
