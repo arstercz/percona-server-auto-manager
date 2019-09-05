@@ -20,7 +20,10 @@ you can compile the source with the same way in [percona-source-install](https:/
 ```
 git clone --recursive https://github.com/arstercz/percona-server-auto-manager.git
 cd percona-server-auto-manager
+
 cmake . -DWITH_MEMCACHED_RECORD=ON
+or
+cmake . # if you don't need memcached record
 
 # just make client
 cd client
