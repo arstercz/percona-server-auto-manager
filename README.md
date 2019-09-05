@@ -21,6 +21,10 @@ you can compile the source with the same way in [percona-source-install](https:/
 git clone --recursive https://github.com/arstercz/percona-server-auto-manager.git
 cd percona-server-auto-manager
 cmake . -DWITH_MEMCACHED_RECORD=ON
+
+# just make client
+cd client
+make -j4
 ```
 the sql filter feature was embedded into `client/mysql` with `--sql-fiter` option, default is on, you can disabled this by `--skip-sql-filter` when you connect mysql server.
 
