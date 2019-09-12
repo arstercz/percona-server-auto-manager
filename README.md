@@ -31,6 +31,9 @@ make -j4
 ```
 the sql filter feature was embedded into `client/mysql` with `--sql-fiter` option, default is on, you can disabled this by `--skip-sql-filter` when you connect mysql server.
 
+**note:** the tokudb need the `gcc version` must greater than `4.7`.
+
+
 ## How does it work?
 
 ### memcached option
