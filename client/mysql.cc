@@ -3509,63 +3509,64 @@ com_go(String *buffer,char *line MY_ATTRIBUTE((unused)))
     }
   }
 
-  //match the table name from sql statement.
-  char *TableName = 
-    regexp_filter_match((char *)"^ALTER\\s+TABLE\\s+(\\S+)\\s+", buffer->ptr());
-
-  if (TableName != NULL && strlen(TableName) > 0)
-  {
-    MetaInfo metainfo = regexp_get_meta(mysql.db, TableName);
-    char *dbname = metainfo.db;
-    char *tablename = metainfo.table;
-
-    if (dbname == NULL || mysql.db == NULL)
+  //match the table name from sql statement to disable alter big table.
+  if(opt_sql_filter &&
+      (regexp_filter_sql((char *)"^ALTER\\s+TABLE\\s+ADD\\s*", buffer->ptr()))) {
+    char *TableName = 
+      regexp_filter_match((char *)"^ALTER\\s+TABLE\\s+(?:`)(\\S+)(?:`)\\s+", buffer->ptr());
+    
+    if (TableName != NULL && strlen(TableName) > 0)
     {
-      fprintf(stderr, "\n\t[WARN] - Must 'use <database>' \
+      MetaInfo metainfo = regexp_get_meta(mysql.db, TableName);
+      char *dbname = metainfo.db;
+      char *tablename = metainfo.table;
+    
+      if (dbname == NULL || mysql.db == NULL)
+      {
+        fprintf(stderr, "\n\t[WARN] - Must 'use <database>' \
 before alter table, current database is null.\n\n");
-      return 0;
-    }
-
-    char sqlSize[350];
-    // ignore DATA_FREE, as TokuDB's DATA_FREE may be too big.
-    // read more from https://jira.percona.com/browse/PS-5704
-    sprintf(sqlSize, "select round(sum(DATA_LENGTH+INDEX_LENGTH)/1024/1024) \
-                      as size from information_schema.tables \
-                      where table_schema = '%s' and table_name = '%s'",
-            dbname, tablename);
-    if (mysql_query(&mysql, sqlSize))
-    {
-      fprintf(stderr, "\t[WARN] - cann't get %s.%s size\n", 
+        return 0;
+      }
+    
+      char sqlSize[350];
+      // ignore DATA_FREE, as TokuDB's DATA_FREE may be too big.
+      // read more from https://jira.percona.com/browse/PS-5704
+      sprintf(sqlSize, "select round(sum(DATA_LENGTH+INDEX_LENGTH)/1024/1024) \
+                        as size from information_schema.tables \
+                        where table_schema = '%s' and table_name = '%s'",
               dbname, tablename);
-      return 0;
-    }
-    MYSQL_RES *result_msg = mysql_store_result(&mysql);
-    if (result_msg == NULL) {
-      fprintf(stderr, "\t[WARN] - cann't find %s.%s, error: %s\n",
-              mysql.db, TableName, mysql_error(&mysql));
-      return 0;
-    }
-    int tableSize = 0;
-    MYSQL_ROW row_result;
-    while ((row_result = mysql_fetch_row(result_msg)))
-    {
-      if (row_result[0] == NULL)
+      if (mysql_query(&mysql, sqlSize))
       {
         fprintf(stderr, "\t[WARN] - cann't get %s.%s size\n", 
-                dbname, TableName);
+                dbname, tablename);
         return 0;
-      } else 
-        if (opt_sql_filter) {
+      }
+      MYSQL_RES *result_msg = mysql_store_result(&mysql);
+      if (result_msg == NULL) {
+        fprintf(stderr, "\t[WARN] - cann't find %s.%s, error: %s\n",
+                mysql.db, TableName, mysql_error(&mysql));
+        return 0;
+      }
+      int tableSize = 0;
+      MYSQL_ROW row_result;
+      while ((row_result = mysql_fetch_row(result_msg)))
+      {
+        if (row_result[0] == NULL)
+        {
+          fprintf(stderr, "\t[WARN] - cann't  get %s.%s size\n", 
+                  dbname, TableName);
+          return 0;
+        } else 
           tableSize = atoi(row_result[0]);
           if (tableSize >= (int)opt_table_threshold) {
             fprintf(stderr, "\n\t[WARN] - the %s.%s size is %dMB, disallowed by administrator\n\n",
                    dbname, tablename, tableSize);
             return 0;
           }
-        }
+      }
     }
+    free(TableName); // free malloc space
   }
-  free(TableName); // free malloc space
 
   //disallowed rules sql statement
   if (opt_sql_filter) {
