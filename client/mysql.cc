@@ -3498,14 +3498,15 @@ com_go(String *buffer,char *line MY_ATTRIBUTE((unused)))
 
   // record all sql
   if (strlen(opt_record_file)) {
-    if (!(record_tmp= (char*) my_malloc((uint) strlen(opt_record_file) + strlen(getenv("USER")),
+    if (!(record_tmp= (char*) my_malloc((uint) strlen(opt_record_file) + strlen(getenv("USER")) + 2,
                                         MYF(MY_WME))))
     {
       fprintf(stderr, "Couldn't allocate memory for record file!\n");
-    }
-    sprintf(record_tmp, "%s.%s", opt_record_file, getenv("USER"));
-    if (record_all_history(record_tmp, buffer->ptr(), mysql.host, mysql.port, mysql.db)) {
-      fprintf(stderr, "record all error!\n");
+    } else {
+      sprintf(record_tmp, "%s.%s", opt_record_file, getenv("USER"));
+      if (record_all_history(record_tmp, buffer->ptr(), mysql.host, mysql.port, mysql.db)) {
+        fprintf(stderr, "record all error!\n");
+      }
     }
   }
 

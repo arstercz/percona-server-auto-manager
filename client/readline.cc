@@ -301,7 +301,7 @@ record_all_history(const char *filename, const char *sql,
         FILE *fp;
         fp = fopen(filename, "a+");
         if(!fp) {
-                //fprintf(stderr, "%s opening failed", filename);
+                fprintf(stderr, "%s opening failed", filename);
                 return 1;
         }
         fprintf(fp, "[%s host:%s port:%d pid:%d ppid:%d login:%s user:%s shell:%s cwd:%s db:%s] %s\n", 
