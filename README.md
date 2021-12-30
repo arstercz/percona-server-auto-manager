@@ -65,8 +65,9 @@ We add the following rules before sending the actual sql queries to MySQL Server
 8. disable 'revoke' syntax;
 9. disable 'load' syntax;
 10. disabled descreased DDL syntax. this means you can not 'purge/truncate/drop' table;
-11. disabled 'set ...' syntax, except 'set names ...';
+11. disabled 'set ...' syntax, except 'set names ...' and 'set global ...';
 12. disabled if table size is greater than --table-threshold value, default is 200(MB);
+13. disable 'UPDATE,DELETE,INSERT,REPLACE,CREATE,DROP,ALTER,TRUNCATE' when read_only is enabled;
 ```
 
 ### record sql

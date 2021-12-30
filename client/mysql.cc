@@ -3510,6 +3510,14 @@ com_go(String *buffer,char *line MY_ATTRIBUTE((unused)))
     }
   }
 
+  // only allow set names and select when enable read_only
+  if (is_readonly && 
+       (regexp_filter_sql((char *)"^INSERT|^UPDATE|^DELETE|^REPLACE|^CREATE|^DROP|^ALTER|^TRUNCATE", buffer->ptr()))) {
+    fprintf(stderr, "\n\t[WARN] - read_only is enabled, \
+maybe a slave instance, ignore all SQL that causes chagne operations.\n\n");
+    return 0;
+  }
+
   //match the table name from sql statement to disable alter big table.
   if(opt_sql_filter &&
       (regexp_filter_sql((char *)"^ALTER\\s+TABLE\\s+ADD\\s*", buffer->ptr()))) {

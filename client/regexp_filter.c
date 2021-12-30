@@ -83,9 +83,9 @@ static RuleSet rule[] = {
   {
     {
       {(char*)"^SET\\s+", RTRUE},
-      {(char*)"\\sNAMES\\s+", RFALSE},
+      {(char*)"\\sNAMES\\s+|\\sGLOBAL\\s+", RFALSE},
     },
-    (char*)"disabled set ... syntax, except names.",
+    (char*)"disabled set ... syntax. but except names and global ...",
   },
 };
 
